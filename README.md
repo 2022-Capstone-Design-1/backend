@@ -30,3 +30,4 @@ pip install -r requirements_backend.txt
 ```
 python start_server.py
 ```
+http://localhost:5000 로 접속하면 swagger 확인 가능
