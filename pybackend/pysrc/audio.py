@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_restx import Api, Resource, Namespace, reqparse, fields
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+from pathlib import Path
 import subprocess, os
 from .tools import createDirectory, trim_audio
 
@@ -81,28 +82,26 @@ class InferenceAudio(Resource):
     def post(self):
         """음성 스크립트를 추론 합니다."""
         args = inference_parser.parse_args()
-        
         id = args['id']
         
         result = ''
+
+        backend_dir_path = Path.cwd()
+        model_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'outputs', '2022-05-29', '18-55-43', 'model.pt')
         
         trim_audio_path = f"./pybackend/upload/{id}/trimAudio"
         trim_audio_list = os.listdir(trim_audio_path)
         
-#         for audio in trim_audio_list:
-#             path = trim_audio_path + '/' + audio
+        for audio in trim_audio_list:
+            path = trim_audio_path + '/' + audio
             
-#             cmd = "python ./pybackend/kospeech2/bin/inference.py " \
-#                       "--model_path \"C:/Users/hooni/Desktop/DL_service/pybackend/kospeech2/outputs/2022-05-29/18-55-43/model.pt\" " \
-#                       f"--audio_path \"{path}\" --device \"cpu\""
-        cmd = "python ./pybackend/kospeech2/bin/inference.py " \
-                      "--model_path \"C:/Users/hooni/Desktop/DL_service/pybackend/kospeech2/outputs/2022-05-29/18-55-43/model.pt\" " \
-                      f"--audio_path \"C:/Users/hooni/Desktop/DL_service/pybackend/upload/{id}/audio/000005.wav\" --device \"cpu\""
+            cmd = "python ./pybackend/kospeech2/bin/inference.py " \
+                      f"--model_path \"{model_path}\" " \
+                      f"--audio_path \"{path}\" --device \"cpu\""
             
-#         C:/Users/hooni/Desktop/DL_service/pybackend/upload/{id}/audio/000005.wav
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        out, err = proc.communicate()
-        out = out.decode('cp949')
-        result += result.join(out.splitlines())
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            out, err = proc.communicate()
+            out = out.decode('cp949')
+            result += result.join(out.splitlines())
             
         return {"result": result}

@@ -19,6 +19,7 @@ import numpy as np
 import torchaudio
 from torch import Tensor
 from tools import revise
+from pathlib import Path
 
 from kospeech.vocabs.ksponspeech import KsponSpeechVocabulary
 from kospeech.data.audio.core import load_audio
@@ -55,7 +56,10 @@ opt = parser.parse_args()
 
 feature = parse_audio(opt.audio_path, del_silence=True)
 input_length = torch.LongTensor([len(feature)])
-vocab = KsponSpeechVocabulary('C:/Users/hooni/Desktop/DL_service/pybackend/kospeech2/data/vocab/lecture_character_vocabs.csv')
+
+backend_dir_path = Path.cwd()
+vocab_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'data', 'vocab', 'lecture_character_vocabs.csv')
+vocab = KsponSpeechVocabulary(f'{vocab_path}')
 
 model = torch.load(opt.model_path, map_location=lambda storage, loc: storage).to(opt.device)
 if isinstance(model, nn.DataParallel):
