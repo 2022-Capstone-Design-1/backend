@@ -1,9 +1,11 @@
 from flask import Flask, request
 from flask_restx import Api, Resource
 from .pysrc.audio import Audio
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.debug = True
+
 api = Api(
     app,
     title='2022-CNU-Capstone-Design-1 API Server',
