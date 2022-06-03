@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from pathlib import Path
 import subprocess, os
 from .tools import createDirectory, trim_audio
+import json
 
 Audio = Namespace(
     name='Audio',
@@ -85,23 +86,32 @@ class InferenceAudio(Resource):
         id = args['id']
         
         result = ''
+        data = {}
 
         backend_dir_path = Path.cwd()
+        inference_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'bin', 'inference.py')
         model_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'outputs', '2022-05-29', '18-55-43', 'model.pt')
         
-        trim_audio_path = f"./pybackend/upload/{id}/trimAudio"
+        # trim_audio_path = f"./pybackend/upload/{id}/trimAudio"
+        trim_audio_path = Path.joinpath(backend_dir_path, 'pybackend', 'upload', f'{id}', 'trimAudio')
         trim_audio_list = os.listdir(trim_audio_path)
         
         for audio in trim_audio_list:
-            path = trim_audio_path + '/' + audio
-            
-            cmd = "python ./pybackend/kospeech2/bin/inference.py " \
+            i = 0
+            # path = trim_audio_path + '/' + audio
+            path = Path.joinpath(trim_audio_path, audio)
+            print(audio)
+
+            cmd = f"python {inference_path} " \
                       f"--model_path \"{model_path}\" " \
                       f"--audio_path \"{path}\" --device \"cpu\""
             
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+
             out, err = proc.communicate()
             out = out.decode('cp949')
+            data[f'{i}~{i+2}'] = out.splitlines()
             result += result.join(out.splitlines())
+            i += 2
             
-        return {"result": result}
+        return json.dumps(data)
