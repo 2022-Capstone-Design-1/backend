@@ -81,37 +81,41 @@ class InferenceAudio(Resource):
     @Audio.expect(inference_parser, validate=True)
     def post(self):
         """음성 스크립트를 추론 합니다."""
-        args = inference_parser.parse_args()
-        id = args['id']
-        
-        result = ''
-        data = {}
+        try:
+            args = inference_parser.parse_args()
+            id = args['id']
 
-        backend_dir_path = Path.cwd()
-        inference_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'bin', 'inference.py')
-        model_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'outputs', '2022-05-29', '18-55-43', 'model.pt')
-        
-        # trim_audio_path = f"./pybackend/upload/{id}/trimAudio"
-        trim_audio_path = Path.joinpath(backend_dir_path, 'pybackend', 'upload', f'{id}', 'trimAudio')
-        trim_audio_list = os.listdir(trim_audio_path)
-        
-        iteration = 0
-        sec = 0
-        for audio in trim_audio_list:
-            
-            # path = trim_audio_path + '/' + audio
-            path = Path.joinpath(trim_audio_path, audio)
+            result = ''
+            data = {}
 
-            cmd = f"python {inference_path} " \
-                      f"--model_path \"{model_path}\" " \
-                      f"--audio_path \"{path}\" --device \"cpu\""
-            
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            backend_dir_path = Path.cwd()
+            inference_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'bin', 'inference.py')
+            model_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'outputs', '2022-05-29', '18-55-43', 'model.pt')
 
-            out, err = proc.communicate()
-            out = out.decode('cp949')
-            data[iteration] = [f'{sec}-{sec+2}', out.splitlines()[0]]
-            iteration += 1
-            sec += 2
-            
-        return json.dumps(data, ensure_ascii=False)
+            # trim_audio_path = f"./pybackend/upload/{id}/trimAudio"
+            trim_audio_path = Path.joinpath(backend_dir_path, 'pybackend', 'upload', f'{id}', 'trimAudio')
+            trim_audio_list = os.listdir(trim_audio_path)
+
+            iteration = 0
+            sec = 0
+            for audio in trim_audio_list:
+
+                # path = trim_audio_path + '/' + audio
+                path = Path.joinpath(trim_audio_path, audio)
+
+                cmd = f"python {inference_path} " \
+                          f"--model_path \"{model_path}\" " \
+                          f"--audio_path \"{path}\" --device \"cpu\""
+
+                proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+
+                out, err = proc.communicate()
+                out = out.decode('cp949')
+                data[iteration] = [f'{sec}-{sec+2}', out.splitlines()[0]]
+                iteration += 1
+                sec += 2
+
+            return json.dumps(data, ensure_ascii=False), 200
+        
+        except:
+            return {"result": "Failed"}, 500
