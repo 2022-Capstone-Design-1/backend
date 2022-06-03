@@ -96,11 +96,12 @@ class InferenceAudio(Resource):
         trim_audio_path = Path.joinpath(backend_dir_path, 'pybackend', 'upload', f'{id}', 'trimAudio')
         trim_audio_list = os.listdir(trim_audio_path)
         
+        iteration = 0
+        sec = 0
         for audio in trim_audio_list:
-            i = 0
+            
             # path = trim_audio_path + '/' + audio
             path = Path.joinpath(trim_audio_path, audio)
-            print(audio)
 
             cmd = f"python {inference_path} " \
                       f"--model_path \"{model_path}\" " \
@@ -110,8 +111,8 @@ class InferenceAudio(Resource):
 
             out, err = proc.communicate()
             out = out.decode('cp949')
-            data[f'{i}~{i+2}'] = out.splitlines()
-            result += result.join(out.splitlines())
-            i += 2
+            data[f'{iteration}'] = [f'{sec}-{sec+2}', out.splitlines()[0]]
+            iteration += 1
+            sec += 2
             
-        return json.dumps(data)
+        return json.dumps(data, ensure_ascii=False)
