@@ -79,6 +79,8 @@ class PostAudio(Resource):
 class InferenceAudio(Resource):
     
     @Audio.expect(inference_parser, validate=True)
+    @Audio.response(200, 'Success')
+    @Audio.response(500, 'Failed')
     def post(self):
         """음성 스크립트를 추론 합니다."""
         try:
