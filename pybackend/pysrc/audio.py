@@ -48,9 +48,8 @@ class PostAudio(Resource):
             
             name, ext = os.path.splitext(f.filename)
             
-#             convertName = name + '.wav'
-#             if ext == '.pcm':
-#                 convertFile = pcm2wav(f.filename, convertName, 1, 16, 16000)
+            if ext != 'wav':
+                return {"result": "Invalid Extension"}
             
             makefolder_path = f"./pybackend/upload/{id}"
             createDirectory(makefolder_path)
@@ -111,7 +110,7 @@ class InferenceAudio(Resource):
 
             out, err = proc.communicate()
             out = out.decode('cp949')
-            data[f'{iteration}'] = [f'{sec}-{sec+2}', out.splitlines()[0]]
+            data[iteration] = [f'{sec}-{sec+2}', out.splitlines()[0]]
             iteration += 1
             sec += 2
             
