@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_restx import Api, Resource
 from .pysrc.audio import Audio
+from .pysrc.video import Video
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -16,3 +17,4 @@ api = Api(
 )
 
 api.add_namespace(Audio, '/audio')
+api.add_namespace(Video, '/video')

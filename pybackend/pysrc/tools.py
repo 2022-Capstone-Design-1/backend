@@ -18,7 +18,7 @@ def convertVideo2Audio(file, file_name, file_id):
     # up/down volumn >> 선택사항 +- 숫자
     # beginning = first_5_seconds + 6
 
-    makefolder_path = f"./pybackend/uploadVideo/{file_id}"
+    makefolder_path = f"./pybackend/upload/uploadVideo/{file_id}"
     createDirectory(makefolder_path)
 
     mp4_version.export(f'{makefolder_path}/audio/{file_name}.wav', format('wav'))
@@ -33,7 +33,7 @@ def convertVideo2Audio(file, file_name, file_id):
         # last_5_seconds = mp4_version[-5000:]
         # first_5_seconds.export('result.pcm', format('u16be'), bitrate='16k')
         # 추출 경로
-        first_10_seconds.export(f'{makefolder_path}/trimAudio/{file_name}_{i}.wav', format('wav'))
+        first_10_seconds.export(f'{makefolder_path}/trimAudio/{file_name}_{i}.wav', format('s16le'), bitrate="16k")
 
 def createDirectory(directory):
     try:

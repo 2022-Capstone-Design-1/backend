@@ -48,10 +48,10 @@ class PostAudio(Resource):
             
             name, ext = os.path.splitext(f.filename)
             
-            if ext != 'wav':
-                return {"result": "Invalid Extension"}
+            if ext != '.wav':
+                return {"result": "Invalid Extension"}, 405
             
-            makefolder_path = f"./pybackend/upload/{id}"
+            makefolder_path = f"./pybackend/upload/uploadAudio/{id}"
             createDirectory(makefolder_path)
             
             f.save(makefolder_path + "/audio/" + secure_filename(f.filename))
@@ -95,7 +95,7 @@ class InferenceAudio(Resource):
             model_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'outputs', '2022-05-29', '18-55-43', 'model.pt')
 
             # trim_audio_path = f"./pybackend/upload/{id}/trimAudio"
-            trim_audio_path = Path.joinpath(backend_dir_path, 'pybackend', 'upload', f'{id}', 'trimAudio')
+            trim_audio_path = Path.joinpath(backend_dir_path, 'pybackend', 'upload/uploadAudio', f'{id}', 'trimAudio')
             trim_audio_list = os.listdir(trim_audio_path)
 
             iteration = 0
@@ -109,10 +109,12 @@ class InferenceAudio(Resource):
                           f"--model_path \"{model_path}\" " \
                           f"--audio_path \"{path}\" --device \"cpu\""
 
-                proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                # proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                # out, err = proc.communicate()
+                # out = out.decode('cp949')
 
-                out, err = proc.communicate()
-                out = out.decode('cp949')
+                out = os.popen(cmd).read()
+                print(out)
                 data[iteration] = [f'{sec}-{sec+2}', out.splitlines()[0]]
                 iteration += 1
                 sec += 2
