@@ -3,13 +3,43 @@ import librosa
 import numpy as np
 import soundfile as sf
 import math
+from pydub import AudioSegment
 import wave
+
+def convertVideo2Audio(file, file_name, file_id):
+    # File upload
+    mp4_version = AudioSegment.from_file(file, "mp4")
+
+    # Slice audio
+    ten_seconds = 10 * 1000
+    one_min = ten_seconds * 6
+    file_len = math.ceil(len(mp4_version) / ten_seconds)
+
+    # up/down volumn >> 선택사항 +- 숫자
+    # beginning = first_5_seconds + 6
+
+    makefolder_path = f"./pybackend/uploadVideo/{file_id}"
+    createDirectory(makefolder_path)
+
+    mp4_version.export(f'{makefolder_path}/audio/{file_name}.wav', format('wav'))
+    # Save the result
+    # can give parameters-quality, channel, etc
+    for i in range(file_len):
+        start_idx = ten_seconds * i
+        last_idx = ten_seconds * (i + 1)
+        if last_idx > len(mp4_version):
+            last_idx = len(mp4_version)
+        first_10_seconds = mp4_version[start_idx:last_idx]
+        # last_5_seconds = mp4_version[-5000:]
+        # first_5_seconds.export('result.pcm', format('u16be'), bitrate='16k')
+        # 추출 경로
+        first_10_seconds.export(f'{makefolder_path}/trimAudio/{file_name}_{i}.wav', format('wav'))
 
 def createDirectory(directory):
     try:
         if not os.path.exists(directory):
             os.makedirs(directory)
-            os.makedirs(directory + '/audio')
+            os.makedirs(directory + f'/audio')
             os.makedirs(directory + '/trimAudio')
     except OSError:
         print("Error: Failed to create the directory.")
