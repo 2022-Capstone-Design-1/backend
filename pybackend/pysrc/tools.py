@@ -20,6 +20,8 @@ def convertVideo2Audio(file, file_name, file_id):
     makefolder_path = f"./pybackend/upload/uploadVideo/{file_id}"
     createDirectory(makefolder_path)
 
+    file.save(f'{makefolder_path}/{file_name}.mp4')
+
     mp4_version.export(f'{makefolder_path}/audio/{file_name}.wav', format('wav'), parameters=['-ar', '16000', '-ac', '1'])
     # Save the result
     # can give parameters-quality, channel, etc
