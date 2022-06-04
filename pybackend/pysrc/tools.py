@@ -9,7 +9,6 @@ import wave
 def convertVideo2Audio(file, file_name, file_id):
     # File upload
     mp4_version = AudioSegment.from_file(file, "mp4")
-
     # Slice audio
     ten_seconds = 10 * 1000
     one_min = ten_seconds * 6
@@ -21,7 +20,7 @@ def convertVideo2Audio(file, file_name, file_id):
     makefolder_path = f"./pybackend/upload/uploadVideo/{file_id}"
     createDirectory(makefolder_path)
 
-    mp4_version.export(f'{makefolder_path}/audio/{file_name}.wav', format('wav'))
+    mp4_version.export(f'{makefolder_path}/audio/{file_name}.wav', format('wav'), parameters=['-ar', '16000', '-ac', '1'])
     # Save the result
     # can give parameters-quality, channel, etc
     for i in range(file_len):
@@ -33,7 +32,7 @@ def convertVideo2Audio(file, file_name, file_id):
         # last_5_seconds = mp4_version[-5000:]
         # first_5_seconds.export('result.pcm', format('u16be'), bitrate='16k')
         # 추출 경로
-        first_10_seconds.export(f'{makefolder_path}/trimAudio/{file_name}_{i}.wav', format('s16le'), bitrate="16k")
+        first_10_seconds.export(f'{makefolder_path}/trimAudio/{file_name}_{i}.wav', format('wav'), bitrate='16k', parameters=['-ar', '16000', '-ac', '1'])
 
 def createDirectory(directory):
     try:
@@ -58,7 +57,7 @@ def trim_audio(audio_file, save_file):
     iteration = int((math.ceil(duration)/sec))
     print(f"iteration : {iteration}")
     
-    for i in range(0, iteration+1):
+    for i in range(0, iteration):
         ny = y[sec*sr*i : (sec*i*sr)+(sr*sec)]
         sf.write(save_file + f'_{i}.wav', ny, sr, format='WAV', endian='LITTLE', subtype='PCM_16')   
         
