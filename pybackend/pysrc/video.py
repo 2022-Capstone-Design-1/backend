@@ -90,9 +90,9 @@ class InferenceAudio(Resource):
 
                 out = os.popen(cmd).read()
                 print(out)
-                data[iteration] = [f'{sec}-{sec + 2}', out.splitlines()[0]]
+                data[iteration] = [f'{sec}', out.splitlines()[0]]
                 iteration += 1
-                sec += 2
+                sec += 10
             data["srcAddress"] = f'http://ec2-52-79-250-218.ap-northeast-2.compute.amazonaws.com:5000/static/{id}.mp4'
             return json.dumps(data, ensure_ascii=False), 200
 

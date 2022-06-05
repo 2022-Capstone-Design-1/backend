@@ -115,7 +115,7 @@ class InferenceAudio(Resource):
 
                 out = os.popen(cmd).read()
                 print(out)
-                data[iteration] = [f'{sec}-{sec+2}', out.splitlines()[0]]
+                data[iteration] = [f'{sec}', out.splitlines()[0]]
                 iteration += 1
                 sec += 2
 
