@@ -1,14 +1,14 @@
 import os
 import librosa
-import numpy as np
 import soundfile as sf
 import math
 from pydub import AudioSegment
-import wave
 
 def convertVideo2Audio(file, file_name, file_id):
+    file.save(f'./pybackend/static/{file_id}.mp4')
+
     # File upload
-    mp4_version = AudioSegment.from_file(file, "mp4")
+    mp4_version = AudioSegment.from_file(f'./pybackend/static/{file_id}.mp4', "mp4")
     # Slice audio
     ten_seconds = 10 * 1000
     one_min = ten_seconds * 6
@@ -19,8 +19,6 @@ def convertVideo2Audio(file, file_name, file_id):
 
     makefolder_path = f"./pybackend/upload/uploadVideo/{file_id}"
     createDirectory(makefolder_path)
-
-    file.save(f'{makefolder_path}/{file_name}.mp4')
 
     mp4_version.export(f'{makefolder_path}/audio/{file_name}.wav', format('wav'), parameters=['-ar', '16000', '-ac', '1'])
     # Save the result

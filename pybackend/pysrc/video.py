@@ -36,7 +36,6 @@ class PostVideo(Resource):
 
             id = args['id']
             f = args['file']
-
             if f.filename == None:
                 return {"result": "None File"}, 404
 
@@ -44,7 +43,6 @@ class PostVideo(Resource):
 
             if ext != '.mp4':
                 return {"result": "Invalid Extension"}, 405
-
             convertVideo2Audio(f, name, id)
             return {"result": "Success"}, 200
 
@@ -95,7 +93,7 @@ class InferenceAudio(Resource):
                 data[iteration] = [f'{sec}-{sec + 2}', out.splitlines()[0]]
                 iteration += 1
                 sec += 2
-
+            data["srcAddress"] = f'http://ec2-52-79-250-218.ap-northeast-2.compute.amazonaws.com:5000/static/{id}.mp4'
             return json.dumps(data, ensure_ascii=False), 200
 
         except:
