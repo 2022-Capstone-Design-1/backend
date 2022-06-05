@@ -73,7 +73,7 @@ class InferenceAudio(Resource):
             # trim_audio_path = f"./pybackend/upload/{id}/trimAudio"
             trim_audio_path = Path.joinpath(backend_dir_path, 'pybackend', 'upload/uploadVideo', f'{id}', 'trimAudio')
             trim_audio_list = os.listdir(trim_audio_path)
-
+            trim_audio_list = sorted(trim_audio_list)
             iteration = 0
             sec = 0
             for audio in trim_audio_list:
