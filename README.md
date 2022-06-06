@@ -1,3 +1,5 @@
+<p align="center"><img width="484" alt="image" src="https://user-images.githubusercontent.com/34434155/172136178-35ae8277-a573-4a6b-864f-510685e806d3.png">
+
 ## Introduction  
 - 영상/음성 파일에 대한 스크립트를 생성하기 위한 서버
 - 서버 : Python Flask restx
