@@ -1,0 +1,5 @@
+./pybackend/static
+*.wav
+*.mp4
+*.log
+*.pt

@@ -19,7 +19,7 @@ post_parser.add_argument('id', type=str, location='form', required=True)
 post_parser.add_argument('file', type=FileStorage, location='files', required=True)
 
 inference_parser = Video.parser()
-inference_parser.add_argument('id', type=str, location='form', required=True)
+inference_parser.add_argument('id', type=str, location='json', required=True)
 
 @Video.route('/postVideo')
 class PostVideo(Resource):
@@ -61,39 +61,60 @@ class InferenceAudio(Resource):
         try:
             args = inference_parser.parse_args()
             id = args['id']
-
+            print(inference_parser)
             result = ''
             data = {}
 
             backend_dir_path = Path.cwd()
-            inference_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'bin', 'inference.py')
-            model_path = Path.joinpath(backend_dir_path, 'pybackend', 'kospeech2', 'outputs', '2022-05-29', '18-55-43',
-                                       'model.pt')
+            inference_path = f'{backend_dir_path}/pybackend/hyper/tasks/SpeechRecognition/klecspeech/scripts/inference.sh'
 
-            # trim_audio_path = f"./pybackend/upload/{id}/trimAudio"
-            trim_audio_path = Path.joinpath(backend_dir_path, 'pybackend', 'upload/uploadVideo', f'{id}', 'trimAudio')
+            trim_audio_path = f"./pybackend/static/upload/uploadVideo/{id}/trimAudio"
+            audio_path = f"./pybackend/static/upload/uploadVideo/{id}/audio"
+            print('path : ' + trim_audio_path)
             trim_audio_list = os.listdir(trim_audio_path)
             trim_audio_list = sorted(trim_audio_list)
+
             iteration = 0
             sec = 0
+            timeTable={}
             for audio in trim_audio_list:
                 # path = trim_audio_path + '/' + audio
-                path = Path.joinpath(trim_audio_path, audio)
-
-                cmd = f"python {inference_path} " \
-                      f"--model_path \"{model_path}\" " \
-                      f"--audio_path \"{path}\" --device \"cpu\""
-
-                # proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-                # out, err = proc.communicate()
-                # out = out.decode('cp949')
+                path = f'{trim_audio_path}/{audio}'
+                print(path)
+                cmd = f"{inference_path} \"{path}\""
 
                 out = os.popen(cmd).read()
+                out = out.splitlines()[61]
+                out = out[14:]
                 print(out)
-                data[iteration] = [f'{sec}', out.splitlines()[0]]
+                timeTable[sec]=out
                 iteration += 1
                 sec += 10
-            data["srcAddress"] = f'http://ec2-52-79-250-218.ap-northeast-2.compute.amazonaws.com:5000/static/{id}.mp4'
+            data["srcAddress"] = f'https://f9c8-106-101-1-109.jp.ngrok.io/static/upload/uploadVideo/{id}/video/{id}.mp4'
+            data['timeTable'] = timeTable
+            audio = os.listdir(audio_path)[0]
+            print(f"{inference_path} /\"{audio_path}/{audio}\"")
+            out = os.popen(f"{inference_path} \"{audio_path}/{audio}\"").read()
+            out = out.splitlines()[61]
+            out = out[14:]
+
+            out = out.replace('요 ', '요. ')
+            out = out.replace('다 ', '다. ')
+
+            data['fullScript'] = out
+
+            # summarize
+            result = ''
+
+            kobart_dir_path = Path.cwd()
+            inference_path = Path.joinpath(kobart_dir_path, 'pybackend', 'KoBART-summarization', 'inference.py')
+
+            cmd = f"python {inference_path} --text \"{out}\""
+
+            result = os.popen(cmd).read()
+            print(result)
+            data['summary'] = result
+
             return json.dumps(data, ensure_ascii=False), 200
 
         except:
